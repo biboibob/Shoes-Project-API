@@ -3,6 +3,8 @@ var router = express.Router();
 
 // const Validator = require("fastest-validator");
 
+
+// INI MASALAH UTAMA
 const { user } = require("../models");
 
 // const v = new Validator();
