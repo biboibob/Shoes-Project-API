@@ -3,7 +3,7 @@ var router = express.Router();
 
 // const Validator = require("fastest-validator");
 
-// const { user } = require("../models");
+const { user } = require("../models");
 
 // const v = new Validator();
 
@@ -26,9 +26,9 @@ var router = express.Router();
 
 /* GET users listing. */
 router.get("/", async (req, res, next) => {
-//   const data = await user.findAll();
-//   return res.json(data);
-    res.json({ message: "hi im in!"});
+  const data = await user.findAll();
+  res.json(data);
+   // res.json({ message: "hi im in!"});
 });
 
 module.exports = router;
