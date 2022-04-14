@@ -1,4 +1,5 @@
 require('dotenv').config()
+import mysql2 from 'mysql2'
 
 const {
   DB_HOSTNAME,
@@ -15,6 +16,7 @@ module.exports = {
     database: DB_NAME,
     host: DB_HOSTNAME,
     dialect: DB_DIALECT,
+    dialectModule: mysql2
   },
   test: {
     username: DB_USERNAME,
@@ -22,6 +24,7 @@ module.exports = {
     database: DB_NAME,
     host: DB_HOSTNAME,
     dialect: DB_DIALECT,
+    dialectModule: mysql2
   },
   production: {
     username: DB_USERNAME,
@@ -29,5 +32,6 @@ module.exports = {
     database: DB_NAME,
     host: DB_HOSTNAME,
     dialect: DB_DIALECT,
+    dialectModule: mysql2
   },
 };
