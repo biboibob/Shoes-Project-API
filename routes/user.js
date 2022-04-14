@@ -1,11 +1,11 @@
 var express = require("express");
 var router = express.Router();
 
-const Validator = require("fastest-validator");
+// const Validator = require("fastest-validator");
 
-const { user } = require("../models");
+// const { user } = require("../models");
 
-const v = new Validator();
+// const v = new Validator();
 
 // router.post("/", async (req, res, next) => {
 //   const schema = {
