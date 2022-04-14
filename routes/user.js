@@ -26,8 +26,9 @@ const v = new Validator();
 
 /* GET users listing. */
 router.get("/", async (req, res, next) => {
-  const data = await user.findAll();
-  return res.json(data);
+//   const data = await user.findAll();
+//   return res.json(data);
+    res.json({ message: "hi im in!"});
 });
 
 module.exports = router;
