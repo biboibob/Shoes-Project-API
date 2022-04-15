@@ -1,30 +1,29 @@
 var express = require("express");
 var router = express.Router();
+const Validator = require("fastest-validator");
 
-// const Validator = require("fastest-validator");
-
-
-// INI MASALAH UTAMA
 const { user } = require("../models");
 
-// const v = new Validator();
+const v = new Validator();
 
-// router.post("/", async (req, res, next) => {
-//   const schema = {
-//     id: "number|optional",
-//     name: "string",
-//     role: "string",
-//   };
+router.post("/", async (req, res, next) => {
+  const schema = {
+    id: "number|optional",
+    username: "string",
+    password: "string",
+    email: "string",
+    role: "string",
+  };
 
-//   const validate = v.validate(req.body, schema);
+  const validate = v.validate(req.body, schema);
 
-//   if (validate.length) {
-//     return res.status(400).json(validate);
-//   } else {
-//     const userAdd = await user.create(req.body);
-//     res.json(userAdd);
-//   }
-// });
+  if (validate.length) {
+    return res.status(400).json(validate);
+  } else {
+    const userAdd = await user.create(req.body);
+    res.json(userAdd);
+  }
+});
 
 /* GET users listing. */
 router.get("/", async (req, res, next) => {
@@ -32,5 +31,7 @@ router.get("/", async (req, res, next) => {
   res.json(data);
    // res.json({ message: "hi im in!"});
 });
+
+
 
 module.exports = router;
