@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
+// const bcrypt = require('bcrypt');
+// const saltRounds = 10;
 
 module.exports = (sequelize, DataTypes) => {
   const user = sequelize.define(
@@ -42,16 +42,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  user.beforeCreate((user, options) => {
-    return bcrypt
-      .hash(user.password, saltRounds)
-      .then((hash) => {
-        user.password = hash;
-      })
-      .catch((err) => {
-        throw new Error();
-      });
-  });
+  // user.beforeCreate((user, options) => {
+  //   return bcrypt
+  //     .hash(user.password, saltRounds)
+  //     .then((hash) => {
+  //       user.password = hash;
+  //     })
+  //     .catch((err) => {
+  //       throw new Error();
+  //     });
+  // });
 
   return user;
 };
