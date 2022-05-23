@@ -13,24 +13,31 @@ const { user } = require("../models");
 
 const v = new Validator();
 
-let refreshTokens = [];
+let currentRefreshTokens = "";
 
 router.post("/refreshToken", (req, res) => {
   const refreshToken = req.body.token;
   if (refreshToken == null) return res.sendStatus(401);
   //if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+  if (currentRefreshTokens != refreshToken) return res.sendStatus(403);
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     (err, userInfo) => {
-      //if (err) return res.sendStatus(403);
       if (err) return res.sendStatus(403);
 
       const { id, username, email, role } = userInfo;
 
       const accessToken = generateAccessToken({ id, username, email, role });
-      res.json({ accessToken: accessToken });
+      const newRefreshToken = generateRefreshToken({
+        id,
+        username,
+        email,
+        role,
+      });
+
+      currentRefreshTokens = newRefreshToken;
+      res.json({ accessToken: accessToken, refreshToken: newRefreshToken });
     }
   );
 });
@@ -78,7 +85,7 @@ router.post("/login", async (req, res, next) => {
           process.env.REFRESH_TOKEN_SECRET
         );
 
-        refreshTokens.push(refreshToken);
+        currentRefreshTokens = refreshToken;
 
         res.json({
           status: 200,
@@ -86,7 +93,7 @@ router.post("/login", async (req, res, next) => {
           data: {
             accessToken: accessToken,
             refreshToken: refreshToken,
-            userInfo: userInfo
+            userInfo: userInfo,
           },
         });
       }
@@ -101,7 +108,13 @@ router.delete("/logout", async (req, res, next) => {
 
 function generateAccessToken(userInfo) {
   return jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "5s",
+    expiresIn: "10s",
+  });
+}
+
+function generateRefreshToken(userInfo) {
+  return jwt.sign(userInfo, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "24h",
   });
 }
 
