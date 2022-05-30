@@ -13,13 +13,13 @@ const { user } = require("../models");
 
 const v = new Validator();
 
-let currentRefreshTokens = "";
+let currentRefreshTokens = [];
 
 router.post("/refreshToken", (req, res) => {
   const refreshToken = req.body.token;
   if (refreshToken == null) return res.sendStatus(401);
   //if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  if (currentRefreshTokens != refreshToken) return res.sendStatus(403);
+  if (!currentRefreshTokens.includes(refreshToken)) return res.sendStatus(403);
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
@@ -36,7 +36,11 @@ router.post("/refreshToken", (req, res) => {
         role,
       });
 
-      currentRefreshTokens = newRefreshToken;
+      currentRefreshTokens = currentRefreshTokens.filter(
+        (token) => token !== req.body.token
+      );
+
+      currentRefreshTokens.push(newRefreshToken);
       res.json({ accessToken: accessToken, refreshToken: newRefreshToken });
     }
   );
@@ -85,7 +89,7 @@ router.post("/login", async (req, res, next) => {
           process.env.REFRESH_TOKEN_SECRET
         );
 
-        currentRefreshTokens = refreshToken;
+        currentRefreshTokens.push(refreshToken);
 
         res.json({
           status: 200,
@@ -102,7 +106,9 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", async (req, res, next) => {
-  refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
+  currentRefreshTokens = currentRefreshTokens.filter(
+    (token) => token !== req.body.token
+  );
   res.sendStatus(204);
 });
 

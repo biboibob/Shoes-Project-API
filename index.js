@@ -38,7 +38,7 @@ app.use(function (req, res, next) {
 
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Content-Type, Authorization, X-CSRF-Token, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version"
+    "Origin, X-Requested-With,  Access-Control-Request-Method, Access-Control-Request-Headers, Content-Type, Authorization, X-CSRF-Token, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version"
   );
 
   //es.setHeader("Access-Control-Request-Headers", true);
