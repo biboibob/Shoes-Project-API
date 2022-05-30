@@ -53,7 +53,6 @@ router.post("/", async (req, res, next) => {
 
 /* GET users listing. */
 router.get("/", authenticateToken, async (req, res, next) => {
-  console.log(req)
   const data = await user.findAll();
   res.json({
     status: 200,
