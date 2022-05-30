@@ -1,20 +1,38 @@
 var bcrypt = require("bcryptjs");
 var saltRounds = bcrypt.genSaltSync(10);
 
-const sequelize = require("sequelize");
 var express = require("express");
-var router = express.Router();
+const router = express.Router();
+const sequelize = require("sequelize");
 const Validator = require("fastest-validator");
+const jwt = require("jsonwebtoken");
+
+router.use(express.json());
 
 const { user } = require("../models");
 
 const v = new Validator();
 
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token == null) {
+    return res.status(401).send("No Token Send!");
+  } else {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, userInfo) => {
+      if (err) return res.status(403).send("Your Token No Longer Valid");
+      req.userInfo = userInfo;
+      next()
+    });
+  }
+}
+
 router.post("/", async (req, res, next) => {
   const schema = {
     id: "number|optional",
     username: "string",
-    password: "string",
+    password: "string|optional",
     email: "string",
     role: "string",
   };
@@ -25,60 +43,46 @@ router.post("/", async (req, res, next) => {
     return res.status(400).json(validate);
   } else {
     const userAdd = await user.create(req.body);
-    res.json(userAdd);
+    res.json({
+      status: 200,
+      content: "Success Adding New",
+      data: userAdd,
+    });
   }
 });
 
 /* GET users listing. */
-router.get("/", async (req, res, next) => {
+router.get("/", authenticateToken, async (req, res, next) => {
   const data = await user.findAll();
-  res.json(data);
-  // res.json({ message: "hi im in!"});
+  res.json({
+    status: 200,
+    content: "Fetching All Users",
+    data: data,
+  });
 });
 
-router.post("/auth", async (req, res, next) => {
-  const schema = {
-    id: "number|optional",
-    username: "string",
-    password: "string",
-  };
 
-  const validate = v.validate(req.body, schema);
+router.patch("/editUser", async (req, res, next) => {
+  let specificUser = user.findByPk(session.userid);
 
-  if (validate.length) {
-    return res.status(400).json(validate);
-  } else {
-    const { username, password } = req.body;
-    const data = await user.findOne({
-      where: sequelize.where(
-        sequelize.fn("BINARY", sequelize.col("username")),
-        username
-      ),
-    });
+  // const schema = {
+  //   username: "string|optional",
+  //   email: "string|optional",
+  //   role: "string|optional",
+  // };
 
-    if (data === null) {
-      res.json({
-        status: 400,
-        content: "Your Username Doesn't Exist",
-        data: [],
-      });
-    } else {
-      const compareHash = bcrypt.compareSync(password, data.password);
-      if (!compareHash) {
-        res.json({
-          status: 400,
-          content: "Your Password Wrong",
-          data: [],
-        });
-      } else {
-        res.json({
-          status: 200,
-          content: "Welcome",
-          data: data,
-        });
-      }
-    }
-  }
+  // const validate = v.validate(req.body, schema);
+
+  // if (validate.length) {
+  //   return res.status(400).json(validate);
+  // } else {
+
+  //   res.json({
+  //     status: 200,
+  //     content: "Success Adding New",
+  //     data: specificUser,
+  //   });
+  // }
 });
 
 module.exports = router;
