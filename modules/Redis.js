@@ -18,12 +18,6 @@ require("dotenv").config();
 // const redis = require("redis");
 const Redis = require("ioredis");
 const redisClient = new Redis(process.env.REDIS_URL);
-              
-// const redisClient = redis.createClient ({
-//   host: 'global-above-grouse-30335.upstash.io',
-//   port: '30335',
-//   password: '39748f796ecc4f5088c91d516adba6ad'
-// });
 
 //get Redis Cache
 function get(redis_key) {
