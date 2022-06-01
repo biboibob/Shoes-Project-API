@@ -38,21 +38,6 @@
             "value" : "1; mode=block"
           }
         ]
-      },
-      {
-        "source": "/:path*",
-        "has": [
-          {
-            "type": "query",
-            "key": "authorized"
-          }
-        ],
-        "headers": [
-          {
-            "key": "x-authorized",
-            "value": "true"
-          }
-        ]
       }
     ]
 
