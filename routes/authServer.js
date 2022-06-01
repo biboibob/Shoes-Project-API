@@ -6,20 +6,21 @@ const router = express.Router();
 const sequelize = require("sequelize");
 const Validator = require("fastest-validator");
 const jwt = require("jsonwebtoken");
-
-router.use(express.json());
+const Redis = require("../modules/Redis");
 
 const { user } = require("../models");
 
+//validator input
 const v = new Validator();
 
-let currentRefreshTokens = [];
+router.use(express.json());
 
-router.post("/refreshToken", (req, res) => {
+router.post("/refreshToken", async (req, res) => {
   const refreshToken = req.body.token;
+  const redisRefreshToken = await Redis.get("RedisRefToken");
+
   if (refreshToken == null) return res.sendStatus(401);
-  //if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-  if (!currentRefreshTokens.includes(refreshToken)) return res.sendStatus(403);
+  if (redisRefreshToken.reply !== refreshToken) return res.sendStatus(403);
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
@@ -35,12 +36,7 @@ router.post("/refreshToken", (req, res) => {
         email,
         role,
       });
-
-      currentRefreshTokens = currentRefreshTokens.filter(
-        (token) => token !== req.body.token
-      );
-
-      currentRefreshTokens.push(newRefreshToken);
+      Redis.set("RedisRefToken", newRefreshToken);
       res.json({ accessToken: accessToken, refreshToken: newRefreshToken });
     }
   );
@@ -88,9 +84,7 @@ router.post("/login", async (req, res, next) => {
           userInfo,
           process.env.REFRESH_TOKEN_SECRET
         );
-
-        currentRefreshTokens.push(refreshToken);
-
+        Redis.set("RedisRefToken", refreshToken);
         res.json({
           status: 200,
           content: "Welcome",
@@ -105,16 +99,14 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.delete("/logout", async (req, res, next) => {
-  currentRefreshTokens = currentRefreshTokens.filter(
-    (token) => token !== req.body.token
-  );
+router.delete("/logout", async (req, res) => {
+  Redis.del("RedisRefToken");
   res.sendStatus(204);
 });
 
 function generateAccessToken(userInfo) {
   return jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "10s",
+    expiresIn: "3s",
   });
 }
 

@@ -2,7 +2,9 @@ require("dotenv").config();
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
-var logger = require("morgan");
+//var logger = require("morgan");
+// const session = require("express-session")
+// let RedisStore = require("connect-redis")(session)
 
 var app = express();
 
@@ -18,6 +20,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+//Redis Config
+// const { createClient } = require("redis")
+// let redisClient = createClient({ legacyMode: true })
+
+// app.use(
+//   session({
+//     store: new RedisStore({ client: redisClient }),
+//     saveUninitialized: false,
+//     secret: "keyboard cat",
+//     resave: false,
+//   })
+// )
 
 //session middleware
 app.use(function (req, res, next) {
@@ -46,6 +61,7 @@ app.use(function (req, res, next) {
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
   res.setHeader("Access-Control-Allow-Credentials", true);
+  
 
   // Pass to next layer of middleware
   next();
