@@ -4,16 +4,31 @@
 //   port: 6379,
 //   legacyMode: true,
 // });
-
-const redisClient = require("redis").createClient;
+require("dotenv").config();
+// const redisClient = require("redis").createClient({
+//   host: process.env.REDIS_HOST,
+//   port: process.env.REDIS_PORT,
+//   password: process.env.REDIS_PASSWORD,
+// });
+// const redisClient = require("redis").createClient();
 // const RedisCon = redisClient(6379, "localhost")
 
 // const redisCon = redisClient(6379, "localhost");
 
+// const redis = require("redis");
+const Redis = require("ioredis");
+const redisClient = new Redis(process.env.REDIS_URL);
+              
+// const redisClient = redis.createClient ({
+//   host: 'global-above-grouse-30335.upstash.io',
+//   port: '30335',
+//   password: '39748f796ecc4f5088c91d516adba6ad'
+// });
+
 //get Redis Cache
 function get(redis_key) {
   return new Promise(async (resolve) => {
-    redisClient().get(redis_key, (err, reply) => {
+    redisClient.get(redis_key, (err, reply) => {
       if (err) {
         console.log("Redis Conn Error", err);
       } else {
@@ -26,7 +41,7 @@ function get(redis_key) {
 
 function set(redis_key, redis_value) {
   return new Promise(async (resolve) => {
-    redisClient().set(redis_key, redis_value, (err, reply) => {
+    redisClient.set(redis_key, redis_value, (err, reply) => {
       if (err) {
         console.log("Redis Conn Error", err);
       } else {
