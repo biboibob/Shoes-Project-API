@@ -100,7 +100,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", async (req, res) => {
-  Redis.del("RedisRefToken");
+  // Redis.del("RedisRefToken");
   res.sendStatus(204);
 });
 

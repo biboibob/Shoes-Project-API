@@ -15,12 +15,15 @@ require("dotenv").config();
 
 // const redisCon = redisClient(6379, "localhost");
 
-// const Redis = require("ioredis");
-// const redisClient = new Redis(process.env.REDIS_URL);
+const Redis = require("ioredis");
+const redis = new Redis(process.env.REDIS_URL);
 
-const { Redis } = require("@upstash/redis");
-const redis = Redis.fromEnv()
-// const redisClient = new Redis("rediss://:39748f796ecc4f5088c91d516adba6ad@global-above-grouse-30335.upstash.io:30335");
+// const { Redis } = require("@upstash/redis/with-fetch");
+// // // const redis = Redis.fromEnv()
+// const redis = new Redis({
+//   url: process.env.UPSTASH_REDIS_REST_URL,
+//   token: process.env.UPSTASH_REDIS_REST_TOKEN,
+// });
 
 //get Redis Cache
 function get(redis_key) {
@@ -48,6 +51,8 @@ function set(redis_key, redis_value) {
     });
   });
 }
+
+
 
 module.exports = {
   get,
