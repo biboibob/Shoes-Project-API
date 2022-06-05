@@ -11,8 +11,8 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/user");
 var authRouter = require("./routes/authServer");
 
-// enable this if you run behind a proxy (e.g. nginx)
-app.set("trust proxy", 1);
+// // enable this if you run behind a proxy (e.g. nginx)
+// app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
