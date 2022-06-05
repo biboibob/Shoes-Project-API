@@ -114,7 +114,7 @@ router.delete("/logout", async (req, res, next) => {
 
 function generateAccessToken(userInfo) {
   return jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "5s",
+    expiresIn: "3s",
   });
 }
 
