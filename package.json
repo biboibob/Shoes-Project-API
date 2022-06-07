@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "./node_modules/.bin/netlify-lambda serve ./index.js",
+    "build": "./node_modules/.bin/netlify-lambda serve ./index.js"
   },
   "dependencies": {
     "@upstash/redis": "^1.6.1",
@@ -19,9 +20,11 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "~1.9.1",
     "mysql2": "^2.3.3",
+    "netlify-lambda": "^2.0.15",
     "nodemon": "^2.0.15",
     "redis": "^3.1.2",
     "sequelize": "^6.19.0",
-    "sequelize-cli": "^6.4.1"
+    "sequelize-cli": "^6.4.1",
+    "serverless-http": "^3.0.1"
   }
 }

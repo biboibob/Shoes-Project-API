@@ -8,6 +8,8 @@ var cookieParser = require("cookie-parser");
 
 var app = express();
 
+const serverLess = require("serverless-http");
+
 //path API
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/user");
@@ -67,6 +69,8 @@ app.use(function (req, res, next) {
   next();
 });
 
+
+
 app.use("/", indexRouter);
 app.use("/user", usersRouter);
 app.use("/authServer", authRouter);
@@ -75,4 +79,4 @@ const PORT = process.env.PORT || 3030;
 
 app.listen(PORT, () => console.log(`This App is running on ${PORT} port`));
 
-module.exports = app;
+module.exports.handler = serverLess(app);
