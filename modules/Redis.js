@@ -11,24 +11,39 @@ require("dotenv").config();
 //   password: process.env.REDIS_PASSWORD,
 // });
 // const redisClient = require("redis").createClient();
-// const RedisCon = redisClient(6379, "localhost")
+// const redis = redisClient(6379, "localhost")
 
 // const redisCon = redisClient(6379, "localhost");
 
 const Redis = require("ioredis");
-const redis = new Redis(process.env.REDIS_URL);
+let client = new Redis(process.env.UPSTASH_REDIS_REST_URL);
 
 // const { Redis } = require("@upstash/redis/with-fetch");
-// // // const redis = Redis.fromEnv()
+// // const redis = Redis.fromEnv()
 // const redis = new Redis({
 //   url: process.env.UPSTASH_REDIS_REST_URL,
 //   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 // });
 
+// const redisCon = require("redis");
+
+// var redis = redisCon.createClient ({
+//   url : 'gusc1-splendid-asp-30175.upstash.io',
+//   port : '30175',
+//   password: '2c2a82779ea24c3090a03685324955f9',
+//   tls: {}
+// });
+
+// redis.on("error", function(err) {
+//   throw err;
+// });
+
+
+
 //get Redis Cache
 function get(redis_key) {
   return new Promise(async (resolve) => {
-    redis.get(redis_key, (err, reply) => {
+    client.get(redis_key, (err, reply) => {
       if (err) {
         console.log("Redis Conn Error", err);
       } else {
@@ -41,7 +56,7 @@ function get(redis_key) {
 
 function set(redis_key, redis_value) {
   return new Promise(async (resolve) => {
-    redis.set(redis_key, redis_value, (err, reply) => {
+    client.set(redis_key, redis_value, (err, reply) => {
       if (err) {
         console.log("Redis Conn Error", err);
       } else {

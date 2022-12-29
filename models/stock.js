@@ -1,46 +1,46 @@
-var bcrypt = require('bcryptjs');
-var saltRounds = bcrypt.genSaltSync(10);
-
 module.exports = (sequelize, DataTypes) => {
-  const user = sequelize.define(
-    "user",
+  const stock = sequelize.define(
+    "stock",
     {
-      id: {
+      id_stock: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      username: {
+      id_shoes: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      stock_number: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      color: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      password: {
+      size: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      role: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
+      sold: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
+
     {
+      timestamps: false,
+
       //this representate which tabel on database
-      tableName: "user",
+      tableName: "stock",
     }
   );
 
-  return user;
+  stock.associate = function (models) {
+    stock.hasOne(models.shoes, { foreignKey: 'id_shoes', as: "shoes" });
+  };
+
+  return stock;
 };

@@ -100,13 +100,13 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", async (req, res) => {
-  // Redis.del("RedisRefToken");
+  Redis.del("RedisRefToken");
   res.sendStatus(204);
 });
 
 function generateAccessToken(userInfo) {
   return jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "3s",
+    expiresIn: "12h",
   });
 }
 
