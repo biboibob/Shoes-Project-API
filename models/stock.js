@@ -39,7 +39,12 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   stock.associate = function (models) {
-    stock.hasOne(models.shoes, { foreignKey: 'id_shoes', as: "shoes" });
+    stock.hasOne(models.shoes, {
+      foreignKey: "id_shoes",
+      sourceKey: "id_shoes",
+      // targetKey: "id_shoes",
+      as: "shoes",
+    });
   };
 
   return stock;

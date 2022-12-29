@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   shoes.associate = function (models) {
-    shoes.hasMany(models.stock, { foreignKey: "id_shoes", as: "stock" });
+    shoes.hasMany(models.stock, { as: "stock" });
   };
 
   // shoes.hasMany(stockModel, { as: "stocks", foreignKey: "id_shoes" });

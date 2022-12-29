@@ -64,21 +64,16 @@ router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
 
   const feature = await stock.findOne({
     attributes: [
+      [Sequelize.fn("max", Sequelize.col("stock.sold")), "mostSold"],
       "id_shoes",
-      [Sequelize.fn("max", Sequelize.col("sold")), "mostSold"],
     ],
     include: {
       model: shoes,
       as: "shoes",
-      // attributes: [
-      //   "id_shoes",
-      //   [sequelize.fn("max", sequelize.col("stock.sold")), "mostSold"],
-      // ]
-      
     },
     where: {
-      '$shoes.id_shoes$': { [Op.ne]: Sequelize.col("stock.id_shoes") } 
-    }
+      "$shoes.id_shoes$": { [Op.eq]: Sequelize.col("stock.id_shoes") },
+    },
   });
 
   res.json({
