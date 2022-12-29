@@ -30,37 +30,21 @@ function authenticateToken(req, res, next) {
 
 /* GET Shoes listing. */
 router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
-  // const newRelease = await shoes.findAll({
-  //   limit: 5,
-  //   order: [["release_date", "DESC"]],
-  // });
+  const newRelease = await shoes.findAll({
+    limit: 5,
+    order: [["release_date", "DESC"]],
+  });
 
-  // const popular = await shoes.findAll({
-  //   attributes: ["name", "price", "release_date", "description"],
-  //   include: {
-  //     model: stock,
-  //     attributes: ["stock_number", "color", "size", "sold"],
-  //     order: [["sold", "DESC"]],
-  //   },
-  //   // limit: 5
-  // });
-
-  // const featured = await stock.findOne({
-  //   attributes: [
-  //     "id_shoes",
-  //     [sequelize.fn("max", sequelize.col("sold")), "mostSold"],
-  //   ],
-  //   include: {
-  //     model: shoes,
-  //     where: {
-  //       id_shoes: sequelize.col('stock.id_shoes')
-  //     }
-  //   },
-
-  //   // where: {
-  //   //   '$shoes.id_shoes$': '1'
-  //   // },
-  // });
+  const popular = await shoes.findAll({
+    attributes: ["name", "price", "release_date", "description"],
+    include: {
+      model: stock,
+      as: 'stock',
+      attributes: ["stock_number", "color", "size", "sold"],
+      order: [["sold", "DESC"]],
+    },
+    // limit: 5
+  });
 
   const feature = await stock.findOne({
     attributes: [
@@ -81,8 +65,8 @@ router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
     content: "Fetching All Users",
     data: {
       feature,
-      // popular,
-      // newRelease
+      popular,
+      newRelease
     },
   });
 });
