@@ -1,6 +1,7 @@
 var bcrypt = require("bcryptjs");
 var saltRounds = bcrypt.genSaltSync(10);
 
+/* import library */
 var express = require("express");
 const router = express.Router();
 const { Sequelize, Op } = require("sequelize");
@@ -9,6 +10,7 @@ const jwt = require("jsonwebtoken");
 
 router.use(express.json());
 
+/* Import Model */
 const { shoes, stock } = require("../models");
 
 const v = new Validator();
@@ -28,7 +30,7 @@ function authenticateToken(req, res, next) {
   }
 }
 
-/* GET Shoes listing. */
+/* GET Home Initiate */
 router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
   const newRelease = await shoes.findAll({
     limit: 5,
@@ -64,6 +66,7 @@ router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
     status: 200,
     content: "Fetching All Users",
     data: {
+      status: true,
       feature,
       popular,
       newRelease

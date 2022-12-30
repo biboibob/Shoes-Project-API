@@ -11,8 +11,9 @@ var app = express();
 //path API
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/user");
-var shoesRouter = require("./routes/shoes");
+var homeRouter = require("./routes/home");
 var authRouter = require("./routes/authServer");
+var categoriesRouter = require("./routes/categories");
 
 // enable this if you run behind a proxy (e.g. nginx)
 app.set("trust proxy", 1);
@@ -71,7 +72,8 @@ app.use(function (req, res, next) {
 app.use("/", indexRouter);
 app.use("/user", usersRouter);
 app.use("/authServer", authRouter);
-app.use("/shoes", shoesRouter);
+app.use("/home", homeRouter);
+app.use("/categories", categoriesRouter);
 
 const PORT = process.env.PORT || 3030;
 
