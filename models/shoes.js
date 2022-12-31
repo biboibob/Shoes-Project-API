@@ -48,18 +48,19 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "id_shoes",
       sourceKey: "id_shoes",
     });
-
-    shoes.hasOne(models.sales, {
-      as: "sales",
-      foreignKey: "id_sale",
-      sourceKey: "id_sale",
+    shoes.hasMany(models.product, {
+      as: "product",
+      foreignKey: "id_shoes",
+      sourceKey: "id_shoes",
     });
 
-    shoes.hasOne(models.category, {
-      as: "category",
-      foreignKey: "id_category",
-      sourceKey: "id_category",
-    });
+    // shoes.hasMany(models.stock, {
+    //   as: "stock",
+    //   foreignKey: "id_shoes",
+    //   sourceKey: "id_shoes",
+    // });
+
+    
   };
 
   // shoes.hasMany(stockModel, { as: "stocks", foreignKey: "id_shoes" });

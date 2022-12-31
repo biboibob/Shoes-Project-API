@@ -32,7 +32,7 @@ function authenticateToken(req, res, next) {
 
 /* POST Home Initiate - (Required to get shoes data) */
 router.post(
-  "/CategoriesInitiate",
+  "/GetShoesListCategory",
   authenticateToken,
   async (req, res, next) => {
     //   const newRelease = await shoes.findAll({
