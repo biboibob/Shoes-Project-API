@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 router.use(express.json());
 
 /* Import Models */
-const { shoes, stock, sales, category } = require("../models");
+const { shoes, stock, sales, category, product } = require("../models");
 
 const v = new Validator();
 
@@ -44,13 +44,12 @@ router.post(
       gender: "array|optional",
       minPrice: "number|optional",
       maxPrice: "number|optional",
-      size: "number|optional",
-      color: "string|optional",
+      size: "array|optional",
+      color: "array|optional",
       offer: "array|optional",
     };
 
     const validate = v.validate(req.body, schema);
-
     if (validate.length) {
       return res.json({
         status: 200,
@@ -60,7 +59,9 @@ router.post(
         },
       });
     } else {
-      const getShoesList = await shoes.findAll({
+      const { size = [], color = [] } = req.body;
+  
+      const getShoesList = await product.findAll({
         include: [
           {
             model: category,
@@ -70,7 +71,33 @@ router.post(
             model: sales,
             as: "sales",
           },
+          {
+            model: shoes,
+            as: "shoes",
+            include: [
+              {
+                model: stock,
+                as: "stock",
+              },
+            ],
+          },
         ],
+        where: {
+          [Op.and]: [
+            {
+              "$shoes.stock.size$": {
+                [Op.between]: [
+                  size.length !== 0 ? Math.min(...size) : 35,
+                  size.length !== 0 ? Math.max(...size) : 50,
+                ],
+              },
+            },{
+              "$shoes.stock.color$": {
+                [Op.in]: color
+              }
+            }
+          ],
+        },
       });
 
       res.json({

@@ -31,11 +31,11 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   product.associate = function (models) {
-    // product.hasMany(models.stock, {
-    //   as: "stock",
-    //   foreignKey: "id_shoes",
-    //   sourceKey: "id_shoes",
-    // });
+    product.hasMany(models.transaction, {
+      as: "transaction",
+      foreignKey: "id_product",
+      sourceKey: "id_product",
+    });
 
     product.hasOne(models.sales, {
       as: "sales",
