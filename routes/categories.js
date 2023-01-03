@@ -40,6 +40,14 @@ router.post(
     //     order: [["release_date", "DESC"]],
     //   });
 
+    const {
+      size = [],
+      color = [],
+      minPrice = 0,
+      maxPrice = 0,
+      gender = [],
+    } = req.body;
+
     const schema = {
       gender: "array|optional",
       minPrice: "number|optional",
@@ -59,25 +67,12 @@ router.post(
         },
       });
     } else {
-
-      const {
-        size = [],
-        color = [],
-        minPrice = -1,
-        maxPrice = -1,
-        gender = [],
-      } = req.body;
-
       /* Object Option to Define Where should use or not*/
-      const option = {
-        where: {
-          [Op.and]: [],
-        },
-      };
+      const option = [];
 
       /* Payload Condition */
       if (size.length > 0) {
-        option.where[Op.and].push({
+        option.push({
           "$shoes.stock.size$": {
             [Op.between]: [
               size.length !== 0 ? Math.min(...size) : 35,
@@ -87,23 +82,38 @@ router.post(
         });
       }
       if (color.length > 0) {
-        option.where[Op.and].push({
+        option.push({
           "$shoes.stock.color$": {
             [Op.in]: color,
           },
         });
       }
-      if(gender.length > 0) {
-        option.where[Op.and].push({
+      if (gender.length > 0) {
+        option.push({
           "$category.category_name$": {
             [Op.in]: gender,
+          },
+        });
+      }
+      if (minPrice > 0) {
+        option.push({
+          "$shoes.price$": {
+            [Op.gte]: minPrice,
+          },
+        });
+      }
+
+      if (maxPrice > 0) {
+        option.push({
+          "$shoes.price$": {
+            [Op.lte]: maxPrice,
           },
         });
       }
 
       /* End Payload Condition */
 
-      console.log(option)
+      console.log(option);
 
       const getShoesList = await product.findAll({
         include: [
@@ -126,23 +136,10 @@ router.post(
             ],
           },
         ],
-        option
-        // where: {
-        //   [Op.and]: [
-        //     {
-        //       "$shoes.stock.size$": {
-        //         [Op.between]: [
-        //           size.length !== 0 ? Math.min(...size) : 35,
-        //           size.length !== 0 ? Math.max(...size) : 50,
-        //         ],
-        //       },
-        //     },{
-        //       "$shoes.stock.color$": {
-        //         [Op.in]: color
-        //       }
-        //     }
-        //   ],
-        // },
+
+        where: {
+          [Op.and]: option,
+        },
       });
 
       res.json({
