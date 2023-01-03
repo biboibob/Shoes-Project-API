@@ -59,8 +59,52 @@ router.post(
         },
       });
     } else {
-      const { size = [], color = [] } = req.body;
-  
+
+      const {
+        size = [],
+        color = [],
+        minPrice = -1,
+        maxPrice = -1,
+        gender = [],
+      } = req.body;
+
+      /* Object Option to Define Where should use or not*/
+      const option = {
+        where: {
+          [Op.and]: [],
+        },
+      };
+
+      /* Payload Condition */
+      if (size.length > 0) {
+        option.where[Op.and].push({
+          "$shoes.stock.size$": {
+            [Op.between]: [
+              size.length !== 0 ? Math.min(...size) : 35,
+              size.length !== 0 ? Math.max(...size) : 50,
+            ],
+          },
+        });
+      }
+      if (color.length > 0) {
+        option.where[Op.and].push({
+          "$shoes.stock.color$": {
+            [Op.in]: color,
+          },
+        });
+      }
+      if(gender.length > 0) {
+        option.where[Op.and].push({
+          "$category.category_name$": {
+            [Op.in]: gender,
+          },
+        });
+      }
+
+      /* End Payload Condition */
+
+      console.log(option)
+
       const getShoesList = await product.findAll({
         include: [
           {
@@ -82,22 +126,23 @@ router.post(
             ],
           },
         ],
-        where: {
-          [Op.and]: [
-            {
-              "$shoes.stock.size$": {
-                [Op.between]: [
-                  size.length !== 0 ? Math.min(...size) : 35,
-                  size.length !== 0 ? Math.max(...size) : 50,
-                ],
-              },
-            },{
-              "$shoes.stock.color$": {
-                [Op.in]: color
-              }
-            }
-          ],
-        },
+        option
+        // where: {
+        //   [Op.and]: [
+        //     {
+        //       "$shoes.stock.size$": {
+        //         [Op.between]: [
+        //           size.length !== 0 ? Math.min(...size) : 35,
+        //           size.length !== 0 ? Math.max(...size) : 50,
+        //         ],
+        //       },
+        //     },{
+        //       "$shoes.stock.color$": {
+        //         [Op.in]: color
+        //       }
+        //     }
+        //   ],
+        // },
       });
 
       res.json({
