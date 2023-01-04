@@ -14,6 +14,7 @@ var usersRouter = require("./routes/user");
 var homeRouter = require("./routes/home");
 var authRouter = require("./routes/authServer");
 var categoriesRouter = require("./routes/categories");
+var detailProductRouter = require("./routes/detailProduct");
 
 // enable this if you run behind a proxy (e.g. nginx)
 app.set("trust proxy", 1);
@@ -74,6 +75,7 @@ app.use("/user", usersRouter);
 app.use("/authServer", authRouter);
 app.use("/home", homeRouter);
 app.use("/categories", categoriesRouter);
+app.use("/detailProduct", detailProductRouter);
 
 const PORT = process.env.PORT || 3030;
 

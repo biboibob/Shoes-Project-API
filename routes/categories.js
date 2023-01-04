@@ -113,8 +113,6 @@ router.post(
 
       /* End Payload Condition */
 
-      console.log(option);
-
       const getShoesList = await product.findAll({
         include: [
           {
