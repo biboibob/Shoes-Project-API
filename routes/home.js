@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 router.use(express.json());
 
 /* Import Model */
-const { shoes, stock } = require("../models");
+const { shoes, stock, product, category } = require("../models");
 
 const v = new Validator();
 
@@ -32,33 +32,78 @@ function authenticateToken(req, res, next) {
 
 /* GET Home Initiate */
 router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
-  const newRelease = await shoes.findAll({
-    limit: 5,
-    order: [["release_date", "DESC"]],
-  });
-
-  const popular = await shoes.findAll({
-    attributes: ["name", "price", "release_date", "description"],
-    include: {
-      model: stock,
-      as: 'stock',
-      attributes: ["stock_number", "color", "size", "sold"],
-      order: [["sold", "DESC"]],
-    },
-    // limit: 5
-  });
-
-  const feature = await stock.findOne({
-    attributes: [
-      [Sequelize.fn("max", Sequelize.col("stock.sold")), "mostSold"],
-      "id_shoes",
+  const newRelease = await product.findAll({
+    include: [
+      {
+        model: shoes,
+        as: "shoes",
+      },
+      {
+        model: category,
+        as: "category",
+      },
     ],
+    limit: 10,
+    order: [[shoes, "release_date", "DESC"]],
+  });
+
+  const popular = await product.findAll({
+    include: [
+      {
+        model: shoes,
+        as: "shoes",
+        include: {
+          model: stock,
+          as: "stock",
+        },
+      },
+      {
+        model: category,
+        as: "category",
+      },
+    ],
+    limit: 10,
+    group: ["id_shoes"],
+    order: [[shoes, stock, "sold", "DESC"]],
+  });
+
+  const detailShoes = await stock.findOne({
+    attributes: ["id_shoes", "sold"],
+    include: [
+      {
+        model: shoes,
+        as: "shoes",
+        where: {
+          id_shoes: { [Op.eq]: Sequelize.col("stock.id_shoes") },
+        },
+      },
+    ],
+    order: [["sold", "DESC"]],
+  });
+
+  const sizeOpt = await stock.findAll({
+    attributes: ["size"],
+    group: ["size"],
+    where: {
+      id_shoes: detailShoes.dataValues.id_shoes,
+    },
+  });
+
+  const colorOpt = await stock.findAll({
+    attributes: ["color"],
+    group: ["color"],
+    where: {
+      id_shoes: detailShoes.dataValues.id_shoes,
+    },
+  });
+
+  const categoryShoes = await product.findOne({
     include: {
-      model: shoes,
-      as: "shoes",
+      model: category,
+      as: "category",
     },
     where: {
-      "$shoes.id_shoes$": { [Op.eq]: Sequelize.col("stock.id_shoes") },
+      id_shoes: detailShoes.dataValues.id_shoes,
     },
   });
 
@@ -67,9 +112,14 @@ router.get("/HomeInitiate", authenticateToken, async (req, res, next) => {
     content: "Fetching All Users",
     data: {
       status: true,
-      feature,
+      featured: {
+        detailShoes,
+        colorOpt,
+        sizeOpt,
+        categoryShoes,
+      },
       popular,
-      newRelease
+      newRelease,
     },
   });
 });

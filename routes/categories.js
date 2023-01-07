@@ -145,7 +145,7 @@ router.post(
         content: "Fetch Success",
         data: {
           status: true,
-          data: getShoesList,
+          getShoesList,
         },
       });
     }

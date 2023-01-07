@@ -49,17 +49,20 @@ router.post("/", authenticateToken, async (req, res, next) => {
       },
     });
   } else {
-    const stockColorDistinct = await stock.findAll({
+    const colorOpt = await stock.findAll({
       attributes: ["color"],
-      group: "color",
+      group: ["color"],
+      where: {
+        id_shoes: id_shoes,
+      },
     });
     const shoesDetail = await shoes.findAll({
-      attributes: ["name", "price", "release_date", "description", stockColorDistinct],
+      attributes: ["name", "price", "release_date", "description"],
       include: [
         {
           model: stock,
           as: "stock",
-          attributes: ["stock_number", "color", "size", "sold"],
+          attributes: ["stock_number", "size", "sold"],
         },
       ],
       where: {
@@ -72,7 +75,8 @@ router.post("/", authenticateToken, async (req, res, next) => {
       content: "Fetch Success",
       data: {
         status: true,
-        data: shoesDetail,
+        colorOpt,
+        shoesDetail,
       },
     });
   }
