@@ -41,6 +41,7 @@ router.post(
     //   });
 
     const {
+      search = "",
       size = [],
       color = [],
       minPrice = 0,
@@ -50,6 +51,7 @@ router.post(
     } = req.body;
 
     const schema = {
+      search: "string|optional",
       gender: "array|optional",
       minPrice: "number|optional",
       maxPrice: "number|optional",
@@ -121,6 +123,14 @@ router.post(
           "$sales.id_sale$": {
             [Op.in]: offer,
           },
+        });
+      }
+
+      if(search !== "") {
+        option.push({
+          "$shoes.Name$": {
+            [Op.substring]: search
+          }
         });
       }
 
