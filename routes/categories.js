@@ -46,6 +46,7 @@ router.post(
       minPrice = 0,
       maxPrice = 0,
       gender = [],
+      offer = [],
     } = req.body;
 
     const schema = {
@@ -74,9 +75,13 @@ router.post(
       if (size.length > 0) {
         option.push({
           "$shoes.stock.size$": {
-            [Op.between]: [
-              size.length !== 0 ? Math.min(...size) : 35,
-              size.length !== 0 ? Math.max(...size) : 50,
+            [Op.and]: [
+              {
+                [Op.gte]: Math.min(...size),
+                
+              },{
+                [Op.lte]: Math.max(...size),
+              }
             ],
           },
         });
@@ -111,6 +116,14 @@ router.post(
         });
       }
 
+      if (offer.length > 0) {
+        option.push({
+          "$sales.id_sale$": {
+            [Op.in]: offer,
+          },
+        });
+      }
+
       /* End Payload Condition */
 
       const getShoesList = await product.findAll({
@@ -134,7 +147,7 @@ router.post(
             ],
           },
         ],
-
+        group: ["id_shoes"],
         where: {
           [Op.and]: option,
         },
@@ -153,8 +166,18 @@ router.post(
 );
 
 /* GET Offer List  */
-router.get("/GetOfferList", authenticateToken, async (req, res, next) => {
+router.get("/GetInitiateFilter", authenticateToken, async (req, res, next) => {
   const getOfferList = await sales.findAll();
+
+  const colorOpt = await stock.findAll({
+    attributes: ["color"],
+    group: ["color"],
+  });
+
+  const sizeOpt = await stock.findAll({
+    attributes: ["size"],
+    group: ["size"],
+  });
 
   res.json({
     status: 200,
@@ -162,6 +185,8 @@ router.get("/GetOfferList", authenticateToken, async (req, res, next) => {
     data: {
       status: true,
       getOfferList,
+      colorOpt,
+      sizeOpt,
     },
   });
 });
