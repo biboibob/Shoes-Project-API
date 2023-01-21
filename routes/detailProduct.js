@@ -49,27 +49,23 @@ router.post("/", authenticateToken, async (req, res, next) => {
       },
     });
   } else {
-    // const stockColorDistinct = await stock.findAll({
-    //   attributes: ["color"],
-    //   group: "color",
-    // });
-
-    // const count = await stock.aggregate('color', 'DISTINCT', { plain: false })
-    const count = await stock.findAll({
-      attributes: [
-        [Sequelize.fn("DISTINCT", Sequelize.col("color")), "colorOpt"],
-      ],
+    const colorOpt = await stock.findAll({
+      attributes: ["color"],
+      group: ["color"],
+      where: {
+        id_shoes: id_shoes,
+      }
     });
 
-    const shoesDetail = await shoes.findAll({
-      attributes: [
-        "name",
-        "price",
-        "release_date",
-        "description",
-        Sequelize.literal(`(SELECT DISTINCT price from shoes)`),
-        // [Sequelize.fn('DISTINCT', Sequelize.col('stock.color')), 'colorOpt'],
-      ],
+    const sizeOpt = await stock.findAll({
+      attributes: ["size"],
+      group: ["size"],
+      where: {
+        id_shoes: id_shoes,
+      }
+    });
+
+    const shoesDetail = await shoes.findOne({
       include: [
         {
           model: stock,
@@ -77,10 +73,20 @@ router.post("/", authenticateToken, async (req, res, next) => {
           attributes: ["stock_number", "size", "sold"],
         },
       ],
-      // where: {
-      //   id_shoes: id_shoes,
-      // },
+      where: {
+        id_shoes: id_shoes,
+      },
     });
+
+    const categoryShoes = await product.findOne({
+      include: {
+        model: category,
+        as: "category"
+      },
+      where: {
+        id_shoes: id_shoes,
+      },
+    })
 
     res.json({
       status: 200,
@@ -88,6 +94,8 @@ router.post("/", authenticateToken, async (req, res, next) => {
       data: {
         status: true,
         colorOpt,
+        sizeOpt,
+        categoryShoes,
         shoesDetail,
       },
     });
