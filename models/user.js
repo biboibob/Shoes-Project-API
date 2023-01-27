@@ -1,4 +1,4 @@
-var bcrypt = require('bcryptjs');
+var bcrypt = require("bcryptjs");
 var saltRounds = bcrypt.genSaltSync(10);
 
 module.exports = (sequelize, DataTypes) => {
@@ -41,6 +41,17 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "user",
     }
   );
+
+  user.beforeCreate((user, options) => {
+    return bcrypt
+      .hash(user.password, saltRounds)
+      .then((hash) => {
+        user.password = hash;
+      })
+      .catch((err) => {
+        throw new Error();
+      });
+  });
 
   return user;
 };
