@@ -13,27 +13,16 @@ router.use(express.json());
 /* Import Models */
 const { shoes, stock, sales, category, product } = require("../models");
 
+// MiddleWare
+const auth = require("../middleware/Auth")
+
 const v = new Validator();
 
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (token == null) {
-    return res.status(401).send("No Token Send!");
-  } else {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, userInfo) => {
-      if (err) return res.status(403).send("Your Token No Longer Valid");
-      req.userInfo = userInfo;
-      next();
-    });
-  }
-}
 
 /* POST Home Initiate - (Required to get shoes data) */
 router.post(
   "/GetShoesListCategory",
-  authenticateToken,
+  auth,
   async (req, res, next) => {
     //   const newRelease = await shoes.findAll({
     //     limit: 5,
@@ -176,7 +165,7 @@ router.post(
 );
 
 /* GET Offer List  */
-router.get("/GetInitiateFilter", authenticateToken, async (req, res, next) => {
+router.get("/GetInitiateFilter", auth, async (req, res, next) => {
   const getOfferList = await sales.findAll();
 
   const colorOpt = await stock.findAll({

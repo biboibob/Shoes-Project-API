@@ -6,33 +6,21 @@ var express = require("express");
 const router = express.Router();
 const { Sequelize, Op } = require("sequelize");
 const Validator = require("fastest-validator");
-const jwt = require("jsonwebtoken");
 const axios = require("axios");
+
+// MiddleWare
+const auth = require("../middleware/Auth");
 
 router.use(express.json());
 
 /* Import Models */
-const { shoes, stock, sales, category, product } = require("../models");
+const { shoes, stock, sales, category, product, user } = require("../models");
 
 const v = new Validator();
 
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (token == null) {
-    return res.status(401).send("No Token Send!");
-  } else {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, userInfo) => {
-      if (err) return res.status(403).send("Your Token No Longer Valid");
-      req.userInfo = userInfo;
-      next();
-    });
-  }
-}
-
 /* GET Offer List  */
-router.get("/getShippingOption", authenticateToken, async (req, res, next) => {
+router.post("/getShippingOption", auth, async (req, res, next) => {
+  const { totalWeight } = req.body;
   //   const getOfferList = await sales.findAll();
 
   //   const colorOpt = await stock.findAll({
@@ -45,23 +33,111 @@ router.get("/getShippingOption", authenticateToken, async (req, res, next) => {
   //     group: ["size"],
   //   });
 
-  const result = await axios({
-    url: "https://api.rajaongkir.com/starter/province",
-    method: "get",
-    headers: { key: "8553a67dd663ed2f55f84f74318760fa" },
+  const data = await user.findOne({
+    attributes: { exclude: ["password"] },
+    where: {
+      id: req.userInfo.id,
+    },
+  });
+
+  const { city } = data.dataValues;
+
+  const resultJNE = await axios({
+    url: "https://api.rajaongkir.com/starter/cost",
+    method: "post",
+    data: {
+      origin: "154",
+      destination: city,
+      weight: totalWeight,
+      courier: "jne",
+    },
+    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
   }).then((res) => {
     return res;
   });
 
-  console.log(result.data.rajaongkir);
+  const resultTIKI = await axios({
+    url: "https://api.rajaongkir.com/starter/cost",
+    method: "post",
+    data: {
+      origin: "154",
+      destination: city,
+      weight: totalWeight,
+      courier: "tiki",
+    },
+    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
+  }).then((res) => {
+    return res;
+  });
+
+  const resultPOS = await axios({
+    url: "https://api.rajaongkir.com/starter/cost",
+    method: "post",
+    data: {
+      origin: "154",
+      destination: city,
+      weight: totalWeight,
+      courier: "pos",
+    },
+    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
+  }).then((res) => {
+    return res;
+  });
 
   res.json({
     status: 200,
     content: "Fetching All Users",
     data: {
       status: true,
-      test: "test",
+      data: [
+        resultJNE.data.rajaongkir.results[0],
+        resultTIKI.data.rajaongkir.results[0],
+        resultPOS.data.rajaongkir.results[0],
+      ],
       //   test2: result
+    },
+  });
+});
+
+/* GET Province List  */
+router.get("/getProvince", auth, async (req, res, next) => {
+  const province = await axios({
+    url: "https://api.rajaongkir.com/starter/province",
+    method: "get",
+    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
+  }).then((res) => {
+    return res;
+  });
+
+  res.json({
+    status: 200,
+    content: "Fetching All Users",
+    data: {
+      status: true,
+      province: province.data.rajaongkir,
+    },
+  });
+});
+
+/* GET City List  */
+router.post("/getCity", auth, async (req, res, next) => {
+  const { province } = req.body;
+
+  const city = await axios({
+    url: "https://api.rajaongkir.com/starter/city",
+    method: "GET",
+    params: { province: province },
+    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
+  }).then((res) => {
+    return res;
+  });
+
+  res.json({
+    status: 200,
+    content: "Fetching All Users",
+    data: {
+      status: true,
+      city: city.data.rajaongkir,
     },
   });
 });

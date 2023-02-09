@@ -42,7 +42,7 @@ router.post("/refreshToken", async (req, res) => {
   );
 });
 
-router.post("/login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => { 
   const schema = {
     id: "number|optional",
     username: "string",
@@ -85,6 +85,7 @@ router.post("/login", async (req, res, next) => {
           process.env.REFRESH_TOKEN_SECRET
         );
         Redis.set("RedisRefToken", refreshToken);
+        Redis.set("loginData", userInfo);
         res.json({
           status: 200,
           content: "Welcome",
@@ -100,6 +101,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", async (req, res) => {
+  Redis.del("loginData");
   Redis.del("RedisRefToken");
   res.sendStatus(204);
 });

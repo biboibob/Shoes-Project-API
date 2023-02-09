@@ -5,28 +5,17 @@ var express = require("express");
 const router = express.Router();
 const sequelize = require("sequelize");
 const Validator = require("fastest-validator");
-const jwt = require("jsonwebtoken");
+const axios = require("axios");
+
+// MiddleWare
+const auth = require("../middleware/Auth");
+
+//Models
+const { user } = require("../models");
 
 router.use(express.json());
 
-const { user } = require("../models");
-
 const v = new Validator();
-
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (token == null) {
-    return res.status(401).send("No Token Send!");
-  } else {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, userInfo) => {
-      if (err) return res.status(403).send("Your Token No Longer Valid");
-      req.userInfo = userInfo;
-      next()
-    });
-  }
-}
 
 router.post("/", async (req, res, next) => {
   const schema = {
@@ -52,7 +41,7 @@ router.post("/", async (req, res, next) => {
 });
 
 /* GET users listing. */
-router.get("/", authenticateToken, async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
   const data = await user.findAll();
   res.json({
     status: 200,
@@ -61,28 +50,70 @@ router.get("/", authenticateToken, async (req, res, next) => {
   });
 });
 
+/* GET users listing. */
+router.get("/detailUser", auth, async (req, res, next) => {
+  const data = await user.findOne({
+    attributes: { exclude: ["password"] },
+    where: {
+      id: req.userInfo.id,
+    },
+  });
 
-router.patch("/editUser", async (req, res, next) => {
-  let specificUser = user.findByPk(session.userid);
+  const dataProvinceAndCity = await axios({
+    url: "https://api.rajaongkir.com/starter/city",
+    method: "GET",
+    params: { province: data.province, id: data.city },
+    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
+  }).then((res) => {
+    return res;
+  });
 
-  // const schema = {
-  //   username: "string|optional",
-  //   email: "string|optional",
-  //   role: "string|optional",
-  // };
+  const { city_name, province } = dataProvinceAndCity.data.rajaongkir.results;
 
-  // const validate = v.validate(req.body, schema);
+  res.json({
+    status: 200,
+    content: "Fetching Specific User",
+    data: {
+      ...data,
+      dataValues: {
+        ...data.dataValues,
+        city_name: city_name,
+        province_name: province,
+      },
+    },
+  });
+});
 
-  // if (validate.length) {
-  //   return res.status(400).json(validate);
-  // } else {
+router.patch("/editUser", auth, async (req, res, next) => {
+  const schema = {
+    username: "string|optional",
+    email: "string|optional",
+    role: "string|optional",
+    receiver: "string|optional",
+    phone: "string|optional",
+    detail_address: "string|optional",
+    address_note: "string|optional",
+    city: "string|optional",
+    province: "string|optional",
+    postal_code: "string|optional",
+  };
 
-  //   res.json({
-  //     status: 200,
-  //     content: "Success Adding New",
-  //     data: specificUser,
-  //   });
-  // }
+  const validate = v.validate(req.body, schema);
+
+  if (validate.length) {
+    return res.status(400).json(validate);
+  } else {
+    const { username, email, role, ...addressData } = req.body;
+
+    await user.update(addressData, {
+      where: { id: req.userInfo.id },
+    });
+
+    res.json({
+      status: 200,
+      content: "Success Update Value New",
+    });
+  }
 });
 
 module.exports = router;

@@ -15,11 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      password: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      email: {
+      password: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -27,13 +27,33 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
+      receiver: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      detail_address: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      address_note: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      city: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      province: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      postal_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {

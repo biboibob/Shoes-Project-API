@@ -10,28 +10,16 @@ const jwt = require("jsonwebtoken");
 
 router.use(express.json());
 
+// MiddleWare
+const auth = require("../middleware/Auth")
+
 /* Import Models */
 const { shoes, stock, sales, category, product } = require("../models");
 
 const v = new Validator();
 
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (token == null) {
-    return res.status(401).send("No Token Send!");
-  } else {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, userInfo) => {
-      if (err) return res.status(403).send("Your Token No Longer Valid");
-      req.userInfo = userInfo;
-      next();
-    });
-  }
-}
-
 /* POST get dataShoes */
-router.post("/", authenticateToken, async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   const { id_shoes } = req.body;
 
   const schema = {
