@@ -7,6 +7,7 @@ const router = express.Router();
 const { Sequelize, Op } = require("sequelize");
 const Validator = require("fastest-validator");
 const jwt = require("jsonwebtoken");
+const Redis = require("../modules/Redis");
 
 router.use(express.json());
 

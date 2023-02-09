@@ -76,8 +76,7 @@ router.post("/login", async (req, res, next) => {
         });
       } else {
         //set JWT Token for client
-        const { id, username, email, role } = data.dataValues;
-        const userInfo = { id, username, email, role };
+        const { password, ...userInfo } = data.dataValues;
 
         const accessToken = generateAccessToken(userInfo);
         const refreshToken = jwt.sign(

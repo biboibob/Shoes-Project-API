@@ -6,6 +6,7 @@ const router = express.Router();
 const sequelize = require("sequelize");
 const Validator = require("fastest-validator");
 const axios = require("axios");
+const Redis = require("../modules/Redis");
 
 // MiddleWare
 const auth = require("../middleware/Auth");
@@ -103,7 +104,15 @@ router.patch("/editUser", auth, async (req, res, next) => {
   if (validate.length) {
     return res.status(400).json(validate);
   } else {
+    const redisLogin = await Redis.get("loginData");
+    
     const { username, email, role, ...addressData } = req.body;
+    
+    //Update Redis Cache
+    Redis.set("loginData", {
+      ...redisLogin.reply,
+      ...addressData
+    })
 
     await user.update(addressData, {
       where: { id: req.userInfo.id },
@@ -111,7 +120,7 @@ router.patch("/editUser", auth, async (req, res, next) => {
 
     res.json({
       status: 200,
-      content: "Success Update Value New",
+      content: "Success Update New Value",
     });
   }
 });
