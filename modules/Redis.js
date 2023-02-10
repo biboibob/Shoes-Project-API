@@ -4,7 +4,8 @@
 //   port: 6379,
 //   legacyMode: true,
 // });
-require("dotenv").config();
+
+// require("dotenv").config();
 const Utils = require("../utils/index");
 // const redisClient = require("redis").createClient({
 //   host: process.env.REDIS_HOST,
