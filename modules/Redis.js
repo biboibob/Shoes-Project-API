@@ -1,44 +1,12 @@
-// const { createClient } = require("redis");
-// let redisClient = createClient({
-//   host: "localhost",
-//   port: 6379,
-//   legacyMode: true,
-// });
 
+//Disable this to make vercel respect environtment variable declared
 // require("dotenv").config();
-const Utils = require("../utils/index");
-// const redisClient = require("redis").createClient({
-//   host: process.env.REDIS_HOST,
-//   port: process.env.REDIS_PORT,
-//   password: process.env.REDIS_PASSWORD,
-// });
-// const redisClient = require("redis").createClient();
-// const redis = redisClient(6379, "localhost")
+//End
 
-// const redisCon = redisClient(6379, "localhost");
+const Utils = require("../utils/index");
 
 const Redis = require("ioredis");
 let client = new Redis(process.env.UPSTASH_REDIS_REST_URL);
-
-// const { Redis } = require("@upstash/redis/with-fetch");
-// // const redis = Redis.fromEnv()
-// const redis = new Redis({
-//   url: process.env.UPSTASH_REDIS_REST_URL,
-//   token: process.env.UPSTASH_REDIS_REST_TOKEN,
-// });
-
-// const redisCon = require("redis");
-
-// var redis = redisCon.createClient ({
-//   url : 'gusc1-splendid-asp-30175.upstash.io',
-//   port : '30175',
-//   password: '2c2a82779ea24c3090a03685324955f9',
-//   tls: {}
-// });
-
-// redis.on("error", function(err) {
-//   throw err;
-// });
 
 //get Redis Cache
 function get(redis_key) {

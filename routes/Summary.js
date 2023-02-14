@@ -21,6 +21,7 @@ const v = new Validator();
 /* GET Offer List  */
 router.post("/getShippingOption", auth, async (req, res, next) => {
   const redisShippingOption = await Redis.get("shippingOption");
+  const redisWeight = await Redis.get("lastTotalWeight");
 
   const { totalWeight } = req.body;
 
@@ -32,9 +33,9 @@ router.post("/getShippingOption", auth, async (req, res, next) => {
   });
 
   const { city } = data.dataValues;
-
+  
   // Cache Hit
-  if (redisShippingOption && city === redisShippingOption?.reply?.city) {
+  if (redisShippingOption && city === redisShippingOption?.reply?.city && redisWeight.reply === totalWeight) {
     res.json({
       status: 200,
       content: "Fetching All Users",
@@ -86,6 +87,8 @@ router.post("/getShippingOption", auth, async (req, res, next) => {
     }).then((res) => {
       return res;
     });
+
+    Redis.set("lastTotalWeight", totalWeight);
 
     Redis.set("shippingOption", {
       city: resultJNE.data.rajaongkir.destination_details.city_id,

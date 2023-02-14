@@ -46,11 +46,11 @@ module.exports = (sequelize, DataTypes) => {
       sourceKey: "id_shoes",
     });
 
-    // shoes.hasMany(models.stock, {
-    //   as: "stock",
-    //   foreignKey: "id_shoes",
-    //   sourceKey: "id_shoes",
-    // });
+    shoes.hasMany(models.image, {
+      as: "image",
+      foreignKey: "id_shoes",
+      sourceKey: "id_shoes",
+    });
 
     
   };

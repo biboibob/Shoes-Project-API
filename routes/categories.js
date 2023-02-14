@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 router.use(express.json());
 
 /* Import Models */
-const { shoes, stock, sales, category, product } = require("../models");
+const { shoes, stock, sales, category, product, image } = require("../models");
 
 // MiddleWare
 const auth = require("../middleware/Auth")
@@ -143,10 +143,14 @@ router.post(
                 model: stock,
                 as: "stock",
               },
+              {
+                model: image,
+                as: "image"
+              }
             ],
           },
         ],
-        group: ["id_shoes"],
+        group: ["product.id_shoes"],
         where: {
           [Op.and]: option,
         },

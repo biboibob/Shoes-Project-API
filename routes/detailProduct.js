@@ -15,7 +15,7 @@ router.use(express.json());
 const auth = require("../middleware/Auth")
 
 /* Import Models */
-const { shoes, stock, sales, category, product } = require("../models");
+const { shoes, stock, sales, category, product, image } = require("../models");
 
 const v = new Validator();
 
@@ -67,6 +67,15 @@ router.post("/", auth, async (req, res, next) => {
       },
     });
 
+    const shoesPreview = await image.findAll({
+      where: {
+        id_shoes: id_shoes,
+        type: {
+          [Op.ne]: "display",
+        } 
+      },
+    });
+
     const categoryShoes = await product.findOne({
       include: {
         model: category,
@@ -86,6 +95,7 @@ router.post("/", auth, async (req, res, next) => {
         sizeOpt,
         categoryShoes,
         shoesDetail,
+        shoesPreview
       },
     });
   }

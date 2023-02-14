@@ -11,10 +11,10 @@ const jwt = require("jsonwebtoken");
 router.use(express.json());
 
 // MiddleWare
-const auth = require("../middleware/Auth")
+const auth = require("../middleware/Auth");
 
 /* Import Model */
-const { shoes, stock, product, category } = require("../models");
+const { shoes, stock, product, category, image } = require("../models");
 
 const v = new Validator();
 
@@ -25,6 +25,12 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
       {
         model: shoes,
         as: "shoes",
+        include: [
+          {
+            model: image,
+            as: "image",
+          },
+        ],
       },
       {
         model: category,
@@ -33,6 +39,7 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
     ],
     limit: 10,
     order: [[shoes, "release_date", "DESC"]],
+    // group: ["shoes.name"],
   });
 
   const popular = await product.findAll({
@@ -40,10 +47,16 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
       {
         model: shoes,
         as: "shoes",
-        include: {
-          model: stock,
-          as: "stock",
-        },
+        include: [
+          {
+            model: stock,
+            as: "stock",
+          },
+          {
+            model: image,
+            as: "image",
+          },
+        ],
       },
       {
         model: category,
@@ -51,8 +64,8 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
       },
     ],
     limit: 10,
-    group: ["id_shoes"],
     order: [[shoes, stock, "sold", "DESC"]],
+    group: ["id_shoes"],
   });
 
   const detailShoes = await stock.findOne({
