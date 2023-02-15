@@ -37,6 +37,8 @@ router.post(
       maxPrice = 0,
       gender = [],
       offer = [],
+      limit,
+      offset
     } = req.body;
 
     const schema = {
@@ -47,6 +49,8 @@ router.post(
       size: "array|optional",
       color: "array|optional",
       offer: "array|optional",
+      limit: "number",
+      offset: "number",
     };
 
     const validate = v.validate(req.body, schema);
@@ -126,6 +130,7 @@ router.post(
       /* End Payload Condition */
 
       const getShoesList = await product.findAll({
+        
         include: [
           {
             model: category,
@@ -149,11 +154,16 @@ router.post(
               }
             ],
           },
-        ],
-        group: ["product.id_shoes"],
+        ], 
+        group: ["id_shoes"],
         where: {
           [Op.and]: option,
         },
+        // offset: limitOffset, 
+        limit: limit,
+        offset: offset,
+        subQuery:false
+       
       });
 
       res.json({
