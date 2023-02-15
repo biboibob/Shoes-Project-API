@@ -77,6 +77,17 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
         where: {
           id_shoes: { [Op.eq]: Sequelize.col("stock.id_shoes") },
         },
+        include: [
+          {
+            model: image,
+            as: "image",
+            where: {
+              type: {
+                [Op.ne]: "display",
+              } 
+            }
+          },
+        ],
       },
     ],
     order: [["sold", "DESC"]],
