@@ -70,9 +70,6 @@ router.post("/", auth, async (req, res, next) => {
     const shoesPreview = await image.findAll({
       where: {
         id_shoes: id_shoes,
-        type: {
-          [Op.ne]: "display",
-        } 
       },
     });
 

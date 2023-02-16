@@ -24,11 +24,6 @@ router.post(
   "/GetShoesListCategory",
   auth,
   async (req, res, next) => {
-    //   const newRelease = await shoes.findAll({
-    //     limit: 5,
-    //     order: [["release_date", "DESC"]],
-    //   });
-
     const {
       search = "",
       size = [],

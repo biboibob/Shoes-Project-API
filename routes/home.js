@@ -32,14 +32,14 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
           },
         ],
       },
-      {
+      { 
         model: category,
         as: "category",
       },
     ],
     limit: 10,
     order: [[shoes, "release_date", "DESC"]],
-    // group: ["shoes.name"],
+    group: ['id_shoes'],
   });
 
   const popular = await product.findAll({
