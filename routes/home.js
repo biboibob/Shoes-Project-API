@@ -19,55 +19,7 @@ const { shoes, stock, product, category, image } = require("../models");
 const v = new Validator();
 
 /* GET Home Initiate */
-router.get("/HomeInitiate", auth, async (req, res, next) => {
-  const newRelease = await product.findAll({
-    include: [
-      {
-        model: shoes,
-        as: "shoes",
-        include: [
-          {
-            model: image,
-            as: "image",
-          },
-        ],
-      },
-      { 
-        model: category,
-        as: "category",
-      },
-    ],
-    limit: 10,
-    order: [[shoes, "release_date", "DESC"]],
-    group: ['id_shoes'],
-  });
-
-  const popular = await product.findAll({
-    include: [
-      {
-        model: shoes,
-        as: "shoes",
-        include: [
-          {
-            model: stock,
-            as: "stock",
-          },
-          {
-            model: image,
-            as: "image",
-          },
-        ],
-      },
-      {
-        model: category,
-        as: "category",
-      },
-    ],
-    limit: 10,
-    order: [[shoes, stock, "sold", "DESC"]],
-    group: ["id_shoes"],
-  });
-
+router.get("/homeInitiate", auth, async (req, res, next) => {
   const detailShoes = await stock.findOne({
     attributes: ["id_shoes", "sold"],
     include: [
@@ -130,8 +82,78 @@ router.get("/HomeInitiate", auth, async (req, res, next) => {
         sizeOpt,
         categoryShoes,
       },
-      popular,
+    },
+  });
+});
+
+/* GET Home Initiate */
+router.get("/newRelease", auth, async (req, res, next) => {
+  const newRelease = await product.findAll({
+    include: [
+      {
+        model: shoes,
+        as: "shoes",
+        include: [
+          {
+            model: image,
+            as: "image",
+          },
+        ],
+      },
+      { 
+        model: category,
+        as: "category",
+      },
+    ],
+    limit: 10,
+    order: [[shoes, "release_date", "DESC"]],
+    group: ['id_shoes'],
+  });
+
+  res.json({
+    status: 200,
+    content: "Fetching New Release Success",
+    data: {
+      status: true,
       newRelease,
+    },
+  });
+});
+
+/* GET Home Initiate */
+router.get("/popular", auth, async (req, res, next) => {
+  const popular = await product.findAll({
+    include: [
+      {
+        model: shoes,
+        as: "shoes",
+        include: [
+          {
+            model: stock,
+            as: "stock",
+          },
+          {
+            model: image,
+            as: "image",
+          },
+        ],
+      },
+      {
+        model: category,
+        as: "category",
+      },
+    ],
+    limit: 10,
+    order: [[shoes, stock, "sold", "DESC"]],
+    group: ["id_shoes"],
+  });
+
+  res.json({
+    status: 200,
+    content: "Fetching Popular Success",
+    data: {
+      status: true,
+      popular,
     },
   });
 });
