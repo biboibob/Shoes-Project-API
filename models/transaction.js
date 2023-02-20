@@ -40,11 +40,23 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     transaction.belongsToMany(models.product, {
-        foreignKey: "id_product",
-        through: "id_product",
-        // targetKey: "id_shoes",
-        as: "product",
-      });
+      foreignKey: "id_product",
+      through: "id_product",
+      // targetKey: "id_shoes",
+      as: "product",
+    });
+
+    transaction.belongsToMany(models.transaction_detail, {
+      foreignKey: "id_transaction",
+      through: "id_transaction",
+      as: "transaction_detail_parent",
+    });
+
+    transaction.belongsToMany(models.transaction_progress, {
+      foreignKey: "id_transaction",
+      through: "id_transaction",
+      as: "transaction_progress_parent",
+    });
   };
 
   return transaction;
