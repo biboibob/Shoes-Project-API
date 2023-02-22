@@ -1,6 +1,6 @@
 
 //Disable this to make vercel respect environtment variable declared
-// require("dotenv").config();
+require("dotenv").config();
 //End
 var express = require("express");
 var path = require("path");
@@ -19,6 +19,7 @@ var authRouter = require("./routes/authServer");
 var categoriesRouter = require("./routes/categories");
 var detailProductRouter = require("./routes/detailProduct");
 var summaryRouter = require("./routes/Summary");
+var transactionRouter = require("./routes/transaction");
 
 // enable this if you run behind a proxy (e.g. nginx)
 app.set("trust proxy", 1);
@@ -81,6 +82,7 @@ app.use("/home", homeRouter);
 app.use("/categories", categoriesRouter);
 app.use("/detailProduct", detailProductRouter);
 app.use("/summary", summaryRouter);
+app.use("/transaction", transactionRouter);
 
 const PORT = process.env.PORT || 3030;
 

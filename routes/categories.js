@@ -4,7 +4,7 @@ var saltRounds = bcrypt.genSaltSync(10);
 /* import library */
 var express = require("express");
 const router = express.Router();
-const { Sequelize, Op } = require("sequelize");
+const { Op } = require("sequelize");
 const Validator = require("fastest-validator");
 const jwt = require("jsonwebtoken");
 

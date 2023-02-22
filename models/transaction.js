@@ -8,16 +8,31 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      id_product: {
+      courier: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      transaction_note: {
+      receipt_number: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      payment_method: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      purchased_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      total_price: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+      },
+      status: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -27,36 +42,30 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
 
       //this representate which tabel on database
-      tableName: "stock",
+      tableName: "transaction",
     }
   );
 
   transaction.associate = function (models) {
-    transaction.belongsToMany(models.user, {
-      foreignKey: "id",
-      through: "id",
-      // targetKey: "id_shoes",
-      as: "user",
-    });
-
-    transaction.belongsToMany(models.product, {
-      foreignKey: "id_product",
-      through: "id_product",
-      // targetKey: "id_shoes",
-      as: "product",
-    });
-
-    transaction.belongsToMany(models.transaction_detail, {
-      foreignKey: "id_transaction",
-      through: "id_transaction",
+    transaction.hasMany(models.transaction_detail, {
       as: "transaction_detail_parent",
+      foreignKey: "id_transaction",
+      sourceKey: "id_transaction",
     });
 
-    transaction.belongsToMany(models.transaction_progress, {
-      foreignKey: "id_transaction",
-      through: "id_transaction",
+    transaction.hasMany(models.transaction_progress, {
       as: "transaction_progress_parent",
+      foreignKey: "id_transaction",
+      sourceKey: "id_transaction",
     });
+
+    transaction.hasMany(models.user, {
+      as: "transaction_id_user",
+      foreignKey: "id",
+      sourceKey: "id",
+    });
+
+    // https://sequelize.org/docs/v6/core-concepts/assocs/
   };
 
   return transaction;

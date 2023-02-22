@@ -14,7 +14,17 @@ const auth = require("../middleware/Auth");
 router.use(express.json());
 
 /* Import Models */
-const { shoes, stock, sales, category, product, user } = require("../models");
+const {
+  shoes,
+  stock,
+  sales,
+  category,
+  product,
+  user,
+  transaction,
+  transaction_detail,
+  transaction_progress,
+} = require("../models");
 
 const v = new Validator();
 
@@ -33,9 +43,13 @@ router.post("/getShippingOption", auth, async (req, res, next) => {
   });
 
   const { city } = data.dataValues;
-  
+
   // Cache Hit
-  if (redisShippingOption && city === redisShippingOption?.reply?.city && redisWeight.reply === totalWeight) {
+  if (
+    redisShippingOption &&
+    city === redisShippingOption?.reply?.city &&
+    redisWeight.reply === totalWeight
+  ) {
     res.json({
       status: 200,
       content: "Fetching All Users",
@@ -167,7 +181,7 @@ router.post("/getCity", auth, async (req, res, next) => {
   // Cache Hit
   if (
     redisCityOption.reply !== null &&
-    redisProvinceOption.reply.province === province 
+    redisProvinceOption.reply.province === province
   ) {
     res.json({
       status: 200,
@@ -206,6 +220,100 @@ router.post("/getCity", auth, async (req, res, next) => {
         status: true,
         city: cityRajaOngkir.data.rajaongkir,
       },
+    });
+  }
+});
+
+router.post("/proceedTransaction", auth, async (req, res, next) => {
+  const schema = {
+    payment_method: "string",
+    courier: "string",
+    purchased_date: "string",
+    receipt_number: "number|optional",
+    total_price: "number",
+    shoes: {
+      type: "array",
+      items: {
+        type: "object",
+        props: {
+          id_product: "number",
+          name: "string",
+          category: "string",
+          image: "string",
+          price: "number",
+          quantity: "number",
+          color: "string",
+          size: "string",
+        },
+      },
+    },
+  };
+
+  const validate = v.validate(req.body, schema);
+
+  if (validate.length) {
+    return res.json({
+      status: 200,
+      content: "Format Invalid",
+      data: {
+        status: false,
+        message: validate[0].message,
+      },
+    });
+  } else {
+    const progressState = [
+      {
+        name: "Purchase Confirmed",
+        description:
+          "Your order has been confirmed by us, and we will prepare to pack your order.",
+      },
+      {
+        name: "Packed Your Order",
+        description:
+          "Currently We Pack Your Order, and will be picked up by our courier agent soon.",
+      },
+    ];
+    // const { username, email, role, ...addressData } = req.body;
+
+    const { courier, payment_method, total_price, purchased_date, shoes } =
+      req.body;
+
+    const transactionData = await transaction.create({
+      id: req.userInfo.id,
+      courier,
+      payment_method,
+      total_price,
+      purchased_date,
+      status: "On-Progress",
+    });
+
+    progressState.map(async (val) => {
+      await transaction_progress.create({
+        id_transaction: transactionData.dataValues.id_transaction,
+        progress_name: val.name,
+        progress_description: val.description,
+        date: purchased_date,
+      });
+    });
+
+    shoes?.map(async (val) => {
+      await transaction_detail.create({
+        id_transaction: transactionData.dataValues.id_transaction,
+        id_product: val.id_product,
+        name: val.name,
+        category: val.category,
+        image: val.image,
+        price: val.price,
+        color: val.color,
+        quantity: val.quantity,
+        size: val.size,
+      });
+    });
+
+    res.json({
+      status: 200,
+      content: "Your purchase has been succeed",
+      data: {},
     });
   }
 });

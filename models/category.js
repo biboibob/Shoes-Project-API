@@ -23,14 +23,12 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   category.associate = function (models) {
-    category.hasMany(models.category, {
-      as: "category",
+    category.hasMany(models.product, {
       foreignKey: "id_category",
       sourceKey: "id_category",
+      as: "category",
     });
   };
-
-  // shoes.hasMany(stockModel, { as: "stocks", foreignKey: "id_shoes" });
 
   return category;
 };

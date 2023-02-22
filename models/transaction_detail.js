@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      id_product: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -25,24 +29,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      receipt_number: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       price: {
         type: DataTypes.DOUBLE,
-        allowNull: false,
-      },
-      payment_method: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      courier: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      purchased_date: {
-        type: DataTypes.DATE,
         allowNull: false,
       },
       quantity: {
@@ -68,11 +56,12 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   transaction_detail.associate = function (models) {
-    transaction_detail.hasOne(models.transaction, {
-      foreignKey: "id_transaction",
+    models.transaction.belongsToMany(models.product, {
+      through: "fk_transaction_product",
       sourceKey: "id_transaction",
-      as: "transaction_detail",
+      targetKey: "id_product",
     });
+    
   };
 
   return transaction_detail;

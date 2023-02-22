@@ -24,11 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         date: {
           type: DataTypes.DATE,
           allowNull: false,
-        },
-        status: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
+        }
       },
   
       {
@@ -40,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     );
   
     transaction_progress.associate = function (models) {
-        transaction_progress.hasOne(models.transaction, {
+        transaction_progress.belongsTo(models.transaction, {
         foreignKey: "id_transaction",
         sourceKey: "id_transaction",
         as: "transaction_progress",

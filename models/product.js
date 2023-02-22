@@ -31,25 +31,25 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   product.associate = function (models) {
-    product.hasMany(models.transaction, {
+    product.hasMany(models.transaction_detail, {
       as: "transaction",
       foreignKey: "id_product",
       sourceKey: "id_product",
     });
 
-    product.hasOne(models.sales, {
+    product.belongsTo(models.sales, {
       as: "sales",
       foreignKey: "id_sale",
       sourceKey: "id_sale",
     });
 
-    product.hasOne(models.category, {
+    product.belongsTo(models.category, {
       as: "category",
       foreignKey: "id_category",
       sourceKey: "id_category",
     });
     
-    product.hasOne(models.shoes, {
+    product.belongsTo(models.shoes, {
       as: "shoes",
       foreignKey: "id_shoes",
       sourceKey: "id_shoes",
