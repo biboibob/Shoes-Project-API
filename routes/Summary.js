@@ -231,12 +231,15 @@ router.post("/proceedTransaction", auth, async (req, res, next) => {
     purchased_date: "string",
     receipt_number: "number|optional",
     total_price: "number",
+    total_discount: "number",
+    shipping_cost: "number",
     shoes: {
       type: "array",
       items: {
         type: "object",
         props: {
           id_product: "number",
+          id_shoes: "number",
           name: "string",
           category: "string",
           image: "string",
@@ -263,20 +266,26 @@ router.post("/proceedTransaction", auth, async (req, res, next) => {
   } else {
     const progressState = [
       {
-        name: "Purchase Confirmed",
-        description:
-          "Your order has been confirmed by us, and we will prepare to pack your order.",
-      },
-      {
         name: "Packed Your Order",
         description:
-          "Currently We Pack Your Order, and will be picked up by our courier agent soon.",
+          "Currently we're packing your order, our courier will be assigned to pick up the package.",
+      },
+      {
+        name: "Purchase Confirmed",
+        description:
+          "Your order has been confirmed, and we will send it to warehouse station.",
       },
     ];
-    // const { username, email, role, ...addressData } = req.body;
 
-    const { courier, payment_method, total_price, purchased_date, shoes } =
-      req.body;
+    const {
+      courier,
+      payment_method,
+      total_price,
+      total_discount,
+      shipping_cost,
+      purchased_date,
+      shoes,
+    } = req.body;
 
     const transactionData = await transaction.create({
       id: req.userInfo.id,
@@ -284,6 +293,8 @@ router.post("/proceedTransaction", auth, async (req, res, next) => {
       payment_method,
       total_price,
       purchased_date,
+      shipping_cost,
+      total_discount,
       status: "On-Progress",
     });
 
@@ -297,6 +308,16 @@ router.post("/proceedTransaction", auth, async (req, res, next) => {
     });
 
     shoes?.map(async (val) => {
+      await stock.decrement("stock_number", {
+        by: val.quantity,
+        where: { id_shoes: val.id_shoes, color: val.color, size: val.size },
+      });
+
+      await stock.increment("sold", {
+        by: val.quantity,
+        where: { id_shoes: val.id_shoes, color: val.color, size: val.size },
+      });
+
       await transaction_detail.create({
         id_transaction: transactionData.dataValues.id_transaction,
         id_product: val.id_product,

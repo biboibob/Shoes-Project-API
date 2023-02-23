@@ -24,8 +24,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+
       purchased_date: {
         type: DataTypes.DATE,
+        allowNull: false,
+      },
+      total_discount: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+      },
+      shipping_cost: {
+        type: DataTypes.DOUBLE,
         allowNull: false,
       },
       total_price: {

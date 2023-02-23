@@ -47,7 +47,7 @@ router.post("/", auth, async (req, res, next) => {
     });
 
     const sizeOpt = await stock.findAll({
-      attributes: ["size"],
+      attributes: ["size", "stock_number"],
       group: ["size"],
       where: {
         id_shoes: id_shoes,

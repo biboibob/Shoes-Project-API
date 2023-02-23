@@ -11,6 +11,7 @@ const {
   transaction_detail,
   transaction_progress,
   transaction,
+  user,
 } = require("../models");
 
 router.use(express.json());
@@ -40,7 +41,7 @@ router.post("/", auth, async (req, res, next) => {
         {
           model: transaction_detail,
           as: "transaction_detail_parent",
-        }
+        },
       ],
       where: {
         [Op.and]: [
@@ -81,7 +82,16 @@ router.post("/transactionDetail", auth, async (req, res, next) => {
     });
   } else {
     const { id_transaction } = req.body;
-    const transactionDetail = await transaction.findAll({
+
+    const userInfo = await user.findOne({
+      where: {
+        id: req.userInfo.id,
+      },
+    });
+
+    const { password, ...withoutPass } = userInfo.dataValues;
+
+    const transactionDetail = await transaction.findOne({
       include: [
         {
           model: transaction_detail,
@@ -104,10 +114,11 @@ router.post("/transactionDetail", auth, async (req, res, next) => {
 
     res.json({
       status: 200,
-      content: "Fetching Transaction List",
+      content: "Fetching Transaction Detail",
       data: {
         status: true,
         transactionDetail,
+        userInfo: withoutPass,
       },
     });
   }

@@ -14,164 +14,150 @@ router.use(express.json());
 const { shoes, stock, sales, category, product, image } = require("../models");
 
 // MiddleWare
-const auth = require("../middleware/Auth")
+const auth = require("../middleware/Auth");
 
 const v = new Validator();
 
-
 /* POST Home Initiate - (Required to get shoes data) */
-router.post(
-  "/GetShoesListCategory",
-  auth,
-  async (req, res, next) => {
-    const {
-      search = "",
-      size = [],
-      color = [],
-      minPrice = 0,
-      maxPrice = 0,
-      gender = [],
-      offer = [],
-      limit,
-      offset
-    } = req.body;
+router.post("/GetShoesListCategory", auth, async (req, res, next) => {
+  const {
+    search = "",
+    size = [],
+    color = [],
+    minPrice = 0,
+    maxPrice = 0,
+    gender = [],
+    offer = [],
+    limit,
+    offset,
+  } = req.body;
 
-    const schema = {
-      search: "string|optional",
-      gender: "array|optional",
-      minPrice: "number|optional",
-      maxPrice: "number|optional",
-      size: "array|optional",
-      color: "array|optional",
-      offer: "array|optional",
-      limit: "number",
-      offset: "number",
-    };
+  const schema = {
+    search: "string|optional",
+    gender: "array|optional",
+    minPrice: "number|optional",
+    maxPrice: "number|optional",
+    size: "array|optional",
+    color: "array|optional",
+    offer: "array|optional",
+    limit: "number",
+    offset: "number",
+  };
 
-    const validate = v.validate(req.body, schema);
-    if (validate.length) {
-      return res.json({
-        status: 200,
-        content: "Format Invalid",
-        data: {
-          status: false,
-        },
-      });
-    } else {
-      /* Object Option to Define Where should use or not*/
-      const option = [];
+  const validate = v.validate(req.body, schema);
+  if (validate.length) {
+    return res.json({
+      status: 200,
+      content: "Format Invalid",
+      data: {
+        status: false,
+      },
+    });
+  } else {
+    /* Object Option to Define Where should use or not*/
+    const option = [];
 
-      /* Payload Condition */
-      if (size.length > 0) {
-        option.push({
-          "$shoes.stock.size$": {
-            [Op.and]: [
-              {
-                [Op.gte]: Math.min(...size),
-                
-              },{
-                [Op.lte]: Math.max(...size),
-              }
-            ],
-          },
-        });
-      }
-      if (color.length > 0) {
-        option.push({
-          "$shoes.stock.color$": {
-            [Op.in]: color,
-          },
-        });
-      }
-      if (gender.length > 0) {
-        option.push({
-          "$category.category_name$": {
-            [Op.in]: gender,
-          },
-        });
-      }
-      if (minPrice > 0) {
-        option.push({
-          "$shoes.price$": {
-            [Op.gte]: minPrice,
-          },
-        });
-      }
-
-      if (maxPrice > 0) {
-        option.push({
-          "$shoes.price$": {
-            [Op.lte]: maxPrice,
-          },
-        });
-      }
-
-      if (offer.length > 0) {
-        option.push({
-          "$sales.id_sale$": {
-            [Op.in]: offer,
-          },
-        });
-      }
-
-      if(search !== "") {
-        option.push({
-          "$shoes.Name$": {
-            [Op.substring]: search
-          }
-        });
-      }
-
-      /* End Payload Condition */
-
-      const getShoesList = await product.findAll({
-        
-        include: [
-          {
-            model: category,
-            as: "category",
-          },
-          {
-            model: sales,
-            as: "sales",
-          },
-          {
-            model: shoes,
-            as: "shoes",
-            include: [
-              {
-                model: stock,
-                as: "stock",
-              },
-              {
-                model: image,
-                as: "image"
-              }
-            ],
-          },
-        ], 
-        group: ["id_shoes"],
-        where: {
-          [Op.and]: option,
-        },
-        // offset: limitOffset, 
-        limit: limit,
-        offset: offset,
-        subQuery:false
-       
-      });
-
-      res.json({
-        status: 200,
-        content: "Fetch Success",
-        data: {
-          status: true,
-          getShoesList,
+    /* Payload Condition */
+    if (size.length > 0) {
+      option.push({
+        "$shoes.stock.size$": {
+          [Op.between]: [Math.min(...size), Math.max(...size)],
         },
       });
     }
+    if (color.length > 0) {
+      option.push({
+        "$shoes.stock.color$": {
+          [Op.in]: color,
+        },
+      });
+    }
+    if (gender.length > 0) {
+      option.push({
+        "$category.category_name$": {
+          [Op.in]: gender,
+        },
+      });
+    }
+    if (minPrice > 0) {
+      option.push({
+        "$shoes.price$": {
+          [Op.gte]: minPrice,
+        },
+      });
+    }
+
+    if (maxPrice > 0) {
+      option.push({
+        "$shoes.price$": {
+          [Op.lte]: maxPrice,
+        },
+      });
+    }
+
+    if (offer.length > 0) {
+      option.push({
+        "$sales.id_sale$": {
+          [Op.in]: offer,
+        },
+      });
+    }
+
+    if (search !== "") {
+      option.push({
+        "$shoes.Name$": {
+          [Op.substring]: search,
+        },
+      });
+    }
+
+    /* End Payload Condition */
+
+    const getShoesList = await product.findAll({
+      include: [
+        {
+          model: category,
+          as: "category",
+        },
+        {
+          model: sales,
+          as: "sales",
+        },
+        {
+          model: shoes,
+          as: "shoes",
+          include: [
+            {
+              model: stock,
+              as: "stock",
+            },
+            {
+              model: image,
+              as: "image",
+            },
+          ],
+        },
+      ],
+      group: ["id_shoes"],
+      where: {
+        [Op.and]: option,
+      },
+      // offset: limitOffset,
+      limit: limit,
+      offset: offset,
+      subQuery: false,
+    });
+
+    res.json({
+      status: 200,
+      content: "Fetch Success",
+      data: {
+        status: true,
+        getShoesList,
+      },
+    });
   }
-);
+});
 
 /* GET Offer List  */
 router.get("/GetInitiateFilter", auth, async (req, res, next) => {

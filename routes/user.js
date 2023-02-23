@@ -95,7 +95,9 @@ router.patch("/editUser", auth, async (req, res, next) => {
     detail_address: "string|optional",
     address_note: "string|optional",
     city: "string|optional",
+    cit_name: "string|optional",
     province: "string|optional",
+    province_name: "string|optional",
     postal_code: "string|optional",
   };
 
