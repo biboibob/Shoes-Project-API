@@ -20,6 +20,7 @@ var categoriesRouter = require("./routes/categories");
 var detailProductRouter = require("./routes/detailProduct");
 var summaryRouter = require("./routes/Summary");
 var transactionRouter = require("./routes/transaction");
+var cartRouter = require("./routes/cart");
 
 // enable this if you run behind a proxy (e.g. nginx)
 app.set("trust proxy", 1);
@@ -83,6 +84,7 @@ app.use("/categories", categoriesRouter);
 app.use("/detailProduct", detailProductRouter);
 app.use("/summary", summaryRouter);
 app.use("/transaction", transactionRouter);
+app.use("/cart", cartRouter);
 
 const PORT = process.env.PORT || 3030;
 

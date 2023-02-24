@@ -14,7 +14,7 @@ router.use(express.json());
 const auth = require("../middleware/Auth");
 
 /* Import Model */
-const { shoes, stock, product, category, image } = require("../models");
+const { shoes, stock, product, category, image, sales } = require("../models");
 
 const v = new Validator();
 
@@ -36,8 +36,8 @@ router.get("/homeInitiate", auth, async (req, res, next) => {
             where: {
               type: {
                 [Op.ne]: "display",
-              } 
-            }
+              },
+            },
           },
         ],
       },
@@ -46,7 +46,7 @@ router.get("/homeInitiate", auth, async (req, res, next) => {
   });
 
   const sizeOpt = await stock.findAll({
-    attributes: ["size"],
+    attributes: ["size", "stock_number"],
     group: ["size"],
     where: {
       id_shoes: detailShoes.dataValues.id_shoes,
@@ -100,14 +100,14 @@ router.get("/newRelease", auth, async (req, res, next) => {
           },
         ],
       },
-      { 
+      {
         model: category,
         as: "category",
       },
     ],
     limit: 10,
     order: [[shoes, "release_date", "DESC"]],
-    group: ['id_shoes'],
+    group: ["id_shoes"],
   });
 
   res.json({
@@ -154,6 +154,18 @@ router.get("/popular", auth, async (req, res, next) => {
     data: {
       status: true,
       popular,
+    },
+  });
+});
+
+router.get("/sliderOffer", auth, async (req, res, next) => {
+  const getOfferList = await sales.findAll();
+  res.json({
+    status: 200,
+    content: "Fetching Popular Success",
+    data: {
+      status: true,
+      getOfferList,
     },
   });
 });
