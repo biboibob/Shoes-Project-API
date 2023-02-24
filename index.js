@@ -54,6 +54,10 @@ app.use(function (req, res, next) {
     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
   );
 
+  //Add Because Google has SameSite Strict as Defualt
+  res.setHeader("Set-Cookie", "HttpOnly;Secure;SameSite=None")
+
+
   // Request headers you wish to allow
   // res.setHeader(
   //   "Access-Control-Allow-Headers",
