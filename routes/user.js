@@ -60,16 +60,16 @@ router.get("/detailUser", auth, async (req, res, next) => {
     },
   });
 
-  const dataProvinceAndCity = await axios({
-    url: "https://api.rajaongkir.com/starter/city",
-    method: "GET",
-    params: { province: data.province, id: data.city },
-    headers: { key: process.env.RAJA_ONGKIR_API_KEY },
-  }).then((res) => {
-    return res;
-  });
+  // const dataProvinceAndCity = await axios({
+  //   url: "https://api.rajaongkir.com/starter/city",
+  //   method: "GET",
+  //   params: { province: data.province, id: data.city },
+  //   headers: { key: process.env.RAJA_ONGKIR_API_KEY },
+  // }).then((res) => {
+  //   return res;
+  // });
 
-  const { city_name, province } = dataProvinceAndCity.data.rajaongkir.results;
+  // const { city_name, province } = dataProvinceAndCity.data.rajaongkir.results;
 
   res.json({
     status: 200,
@@ -78,8 +78,8 @@ router.get("/detailUser", auth, async (req, res, next) => {
       ...data,
       dataValues: {
         ...data.dataValues,
-        city_name: city_name,
-        province_name: province,
+        // city_name: city_name,
+        // province_name: province,
       },
     },
   });
