@@ -32,12 +32,23 @@ router.post("/", async (req, res, next) => {
   if (validate.length) {
     return res.status(400).json(validate);
   } else {
-    const userAdd = await user.create(req.body);
-    res.json({
-      status: 200,
-      content: "Success Adding New",
-      data: userAdd,
+    const { username } = req.body;
+    const findUser = await user.findOne({
+      where: {
+        username: username,
+      },
     });
+
+    if (findUser === null) {
+      const userAdd = await user.create(req.body);
+      res.json({
+        status: 200,
+        content: "Success Adding New",
+        data: userAdd,
+      });
+    } else {
+      res.status(406).send({ error: 'Username already used!' })
+    }
   }
 });
 
@@ -107,14 +118,14 @@ router.patch("/editUser", auth, async (req, res, next) => {
     return res.status(400).json(validate);
   } else {
     const redisLogin = await Redis.get("loginData");
-    
+
     const { username, email, role, ...addressData } = req.body;
-    
+
     //Update Redis Cache
     Redis.set("loginData", {
       ...redisLogin.reply,
-      ...addressData
-    })
+      ...addressData,
+    });
 
     await user.update(addressData, {
       where: { id: req.userInfo.id },
