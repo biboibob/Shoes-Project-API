@@ -1,5 +1,5 @@
 //Disable this to make vercel respect environtment variable declared
-require("dotenv").config();
+// require("dotenv").config();
 //End
 var express = require("express");
 var path = require("path");
