@@ -59,7 +59,7 @@ router.post("/", auth, async (req, res, next) => {
         {
           model: stock,
           as: "stock",
-          attributes: ["stock_number", "size", "sold"],
+          attributes: ["stock_number", "color", "size", "sold"],
         },
       ],
       where: {
