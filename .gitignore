@@ -1,3 +1,4 @@
+.DS_Store
+
 # Secret file
 .env
-.DS_STORE
